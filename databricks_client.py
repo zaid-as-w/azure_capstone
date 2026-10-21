@@ -19,15 +19,29 @@ DEFAULT_SCHEMA = "default"
 DATABRICKS_AZURE_RESOURCE_ID = "2ff814a6-3304-4ab8-85cb-cd0e6f879c1d"
 
 
+def _get_config_val(key: str, default: str) -> str:
+    """Retrieve config from env vars first, then st.secrets, then default."""
+    val = os.getenv(key)
+    if val:
+        return val
+    try:
+        import streamlit as st
+        if hasattr(st, "secrets") and key in st.secrets:
+            return str(st.secrets[key])
+    except Exception:
+        pass
+    return default
+
+
 def get_databricks_token() -> str:
     """
     Acquire authentication token for Databricks.
-    Checks environment variable DATABRICKS_TOKEN first.
+    Checks environment variable DATABRICKS_TOKEN and st.secrets first.
     If not found, dynamically acquires an Azure AD Bearer token via DefaultAzureCredential.
     """
-    env_token = os.getenv("DATABRICKS_TOKEN")
-    if env_token:
-        return env_token
+    token = _get_config_val("DATABRICKS_TOKEN", "")
+    if token:
+        return token
 
     try:
         credential = DefaultAzureCredential()
@@ -41,8 +55,8 @@ def get_databricks_token() -> str:
             return token_obj.token
         except Exception as cli_err:
             raise ConnectionError(
-                f"Failed to acquire Databricks token via Azure AD: {e}. "
-                f"CLI error: {cli_err}. Please ensure `az login` is active or set DATABRICKS_TOKEN."
+                f"Failed to acquire Databricks token: {e}. "
+                f"CLI error: {cli_err}. Please ensure DATABRICKS_TOKEN is set in Streamlit secrets or `az login` is active."
             )
 
 
@@ -53,10 +67,10 @@ def get_connection(
     schema: Optional[str] = None,
 ):
     """Create a connection to the Databricks SQL Warehouse."""
-    hostname = server_hostname or os.getenv("DATABRICKS_SERVER_HOSTNAME", DEFAULT_SERVER_HOSTNAME)
-    path = http_path or os.getenv("DATABRICKS_HTTP_PATH", DEFAULT_HTTP_PATH)
-    cat = catalog or os.getenv("DATABRICKS_CATALOG", DEFAULT_CATALOG)
-    sch = schema or os.getenv("DATABRICKS_SCHEMA", DEFAULT_SCHEMA)
+    hostname = server_hostname or _get_config_val("DATABRICKS_SERVER_HOSTNAME", DEFAULT_SERVER_HOSTNAME)
+    path = http_path or _get_config_val("DATABRICKS_HTTP_PATH", DEFAULT_HTTP_PATH)
+    cat = catalog or _get_config_val("DATABRICKS_CATALOG", DEFAULT_CATALOG)
+    sch = schema or _get_config_val("DATABRICKS_SCHEMA", DEFAULT_SCHEMA)
     token = get_databricks_token()
 
     return sql.connect(

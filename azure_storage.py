@@ -12,31 +12,45 @@ CONTAINER_NAME = "bronze"
 def upload_file(uploaded_file):
     """Upload a Streamlit file to Azure Storage."""
 
+    # Check environment variable first, then Streamlit Cloud secrets
     account_name = os.getenv("AZURE_STORAGE_ACCOUNT")
+    conn_str = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+    try:
+        import streamlit as st
+        if hasattr(st, "secrets"):
+            if not account_name and "AZURE_STORAGE_ACCOUNT" in st.secrets:
+                account_name = st.secrets["AZURE_STORAGE_ACCOUNT"]
+            if not conn_str and "AZURE_STORAGE_CONNECTION_STRING" in st.secrets:
+                conn_str = st.secrets["AZURE_STORAGE_CONNECTION_STRING"]
+    except Exception:
+        pass
 
-    if not account_name:
+    if not account_name and not conn_str:
         raise ValueError(
-            "AZURE_STORAGE_ACCOUNT environment variable is missing."
+            "AZURE_STORAGE_ACCOUNT (or AZURE_STORAGE_CONNECTION_STRING) is missing. "
+            "Please configure it in environment variables or Streamlit secrets."
         )
 
     if not uploaded_file.name.lower().endswith(".csv"):
         raise ValueError("Only CSV files are allowed.")
 
-    # Use only the filename, not a user-supplied directory path.
     filename = Path(uploaded_file.name).name
     blob_name = f"uploads/{filename}"
 
-    account_url = (
-        f"https://{account_name}.blob.core.windows.net"
-    )
-
-    credential = DefaultAzureCredential()
+    service_client = None
+    credential = None
 
     try:
-        service_client = BlobServiceClient(
-            account_url=account_url,
-            credential=credential
-        )
+        if conn_str:
+            service_client = BlobServiceClient.from_connection_string(conn_str)
+            account_url = service_client.primary_endpoint.rstrip("/")
+        else:
+            account_url = f"https://{account_name}.blob.core.windows.net"
+            credential = DefaultAzureCredential()
+            service_client = BlobServiceClient(
+                account_url=account_url,
+                credential=credential
+            )
 
         blob_client = service_client.get_blob_client(
             container=CONTAINER_NAME,
@@ -55,7 +69,7 @@ def upload_file(uploaded_file):
         }
 
     finally:
-        if "service_client" in locals():
+        if service_client is not None:
             service_client.close()
-
-        credential.close()
+        if credential is not None:
+            credential.close()
