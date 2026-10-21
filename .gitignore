@@ -1,51 +1,55 @@
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-*.egg-info/
-dist/
-build/
-
-# Virtual environments
-.venv/
-venv/
-env/
-
-# Secrets & credentials — NEVER COMMIT
+# Secrets and environment configuration
 .env
 .env.*
+!.env.example
 *.env
 secrets.json
 credentials.json
 .streamlit/secrets.toml
-
-# Azure CLI cached credentials — NEVER COMMIT
+*.pem
+*.key
+*.pfx
+*.p12
+*.cer
+secrets/
+credentials/
 .azure/
+.azure-cli/
 .azcopy/
+.databricks/
 
-# IDE
-.vscode/settings.json
-.idea/
-*.swp
-*.swo
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
 
 # Jupyter
 .ipynb_checkpoints/
-*.ipynb
 
-# OS artifacts
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# Test artifacts & scratch
+# Logs and temporary files
+*.log
+logs/
+tmp/
+temp/
 scratch/
 *.tmp
 
-# Large data files — use ADLS Gen2 instead
-# data/*.csv  (small test files kept intentionally)
-
-# Logs
-*.log
+# IDE and operating system files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
