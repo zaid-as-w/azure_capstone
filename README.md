@@ -2,6 +2,13 @@
 
 > **End-to-end Medallion Architecture** on Azure: CSV Upload → ADLS Gen2 Bronze → PySpark/Delta Lake Silver → Gold Analytics → Databricks SQL → Streamlit Dashboard
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://azurecapstone-d8h5vw7wekj6jujl4uyjsc.streamlit.app)
+[![Azure Data Factory](https://img.shields.io/badge/Orchestration-Azure%20Data%20Factory-0078D4?logo=microsoftazure)](https://azure.microsoft.com/services/data-factory/)
+[![Azure Databricks](https://img.shields.io/badge/Compute-Azure%20Databricks%20(Delta)-FF3621?logo=databricks)](https://databricks.com/)
+
+🚀 **Live Interactive Dashboard:**  
+👉 **[https://azurecapstone-d8h5vw7wekj6jujl4uyjsc.streamlit.app](https://azurecapstone-d8h5vw7wekj6jujl4uyjsc.streamlit.app)**
+
 ---
 
 ## 🏆 Problem Statement
@@ -226,18 +233,26 @@ az datafactory pipeline-run show `
 
 ---
 
-## 📈 Running the Streamlit Dashboard
+## 📈 Live Dashboard & Local Execution
+
+### 🌐 Live Cloud Deployment
+Access the interactive dashboard deployed on Streamlit Community Cloud:  
+👉 **[https://azurecapstone-d8h5vw7wekj6jujl4uyjsc.streamlit.app](https://azurecapstone-d8h5vw7wekj6jujl4uyjsc.streamlit.app)**
+
+---
+
+### 💻 Running Locally
 
 ```powershell
 # Activate venv and set environment variables
 .venv\Scripts\Activate.ps1
 $env:AZURE_STORAGE_ACCOUNT = "zaid123"
 
-# Run
+# Run locally
 streamlit run app.py
 ```
 
-Dashboard opens at: `http://localhost:8501`
+Local dashboard opens at: `http://localhost:8501`
 
 **Tabs:**
 - **Executive Sales Analytics** — KPIs, Revenue by Category, City, Monthly Trend (live Databricks SQL)
