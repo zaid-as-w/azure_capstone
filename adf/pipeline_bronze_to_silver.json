@@ -1,0 +1,49 @@
+{
+  "name": "PL_Sales_Bronze_To_Silver",
+  "properties": {
+    "description": "Orchestrates Bronze-to-Silver PySpark processing on Databricks with parameterized input path",
+    "activities": [
+      {
+        "name": "Bronze_To_Silver_Notebook",
+        "type": "DatabricksNotebook",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.00:30:00",
+          "retry": 1,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "notebookPath": "/azure-capstone/nb_bronze_to_silver",
+          "baseParameters": {
+            "input_path": {
+              "value": "@pipeline().parameters.input_path",
+              "type": "Expression"
+            },
+            "storage_account": "zaid123",
+            "pipeline_run_id": {
+              "value": "@pipeline().RunId",
+              "type": "Expression"
+            }
+          }
+        },
+        "linkedServiceName": {
+          "referenceName": "LS_AzureDatabricks",
+          "type": "LinkedServiceReference"
+        }
+      }
+    ],
+    "parameters": {
+      "input_path": {
+        "type": "string",
+        "defaultValue": "abfss://bronze@zaid123.dfs.core.windows.net/uploads/sales.csv"
+      }
+    },
+    "annotations": [
+      "capstone",
+      "bronze_to_silver"
+    ]
+  }
+}

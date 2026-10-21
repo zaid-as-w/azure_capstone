@@ -1,0 +1,5 @@
+order_id,order_date,customer_id,category,city,quantity,unit_price
+1011,2026-03-10,C110,Electronics,Dharwad,1,32000
+1012,2026-03-12,C111,Clothing,Belagavi,5,1500
+1013,2026-03-14,C112,Food,Hubballi,12,80
+1014,2026-03-15,C113,Electronics,Bagalkot,3,12000

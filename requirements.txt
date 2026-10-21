@@ -1,0 +1,6 @@
+streamlit
+pandas
+plotly
+azure-identity
+azure-storage-blob
+databricks-sql-connector

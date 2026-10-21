@@ -1,0 +1,7 @@
+order_id,order_date,customer_id,category,city,quantity,unit_price
+,2026-03-20,C120,Electronics,Belagavi,1,10000
+1020,invalid-date,C121,Clothing,Hubballi,2,1200
+1021,2026-03-22,C122,,Bagalkot,3,500
+1022,2026-03-23,C123,Food,,4,250
+1023,2026-03-24,C124,Electronics,Belagavi,-1,15000
+1024,2026-03-25,C125,Clothing,Hubballi,2,-500

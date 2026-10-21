@@ -1,0 +1,82 @@
+{
+  "name": "PL_Sales_Incremental_Ingestion",
+  "properties": {
+    "description": "Incremental Ingestion and Data Quality Pipeline: Processes new and modified Bronze files, tracks status in Delta control table, performs idempotent MERGE into Silver, and updates Gold analytics",
+    "activities": [
+      {
+        "name": "Incremental_Ingestion_Controller",
+        "type": "DatabricksNotebook",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.00:45:00",
+          "retry": 1,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "notebookPath": "/azure-capstone/nb_file_ingestion_control",
+          "baseParameters": {
+            "storage_account": "zaid123",
+            "pipeline_run_id": {
+              "value": "@pipeline().RunId",
+              "type": "Expression"
+            },
+            "target_file": {
+              "value": "@pipeline().parameters.target_file",
+              "type": "Expression"
+            }
+          }
+        },
+        "linkedServiceName": {
+          "referenceName": "LS_AzureDatabricks",
+          "type": "LinkedServiceReference"
+        }
+      },
+      {
+        "name": "Refresh_Gold_Analytics",
+        "type": "DatabricksNotebook",
+        "dependsOn": [
+          {
+            "activity": "Incremental_Ingestion_Controller",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.00:30:00",
+          "retry": 1,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "notebookPath": "/azure-capstone/nb_silver_to_gold",
+          "baseParameters": {
+            "storage_account": "zaid123",
+            "catalog_name": "zaid_capstone_dbx_7405607366206759",
+            "schema_name": "default"
+          }
+        },
+        "linkedServiceName": {
+          "referenceName": "LS_AzureDatabricks",
+          "type": "LinkedServiceReference"
+        }
+      }
+    ],
+    "parameters": {
+      "target_file": {
+        "type": "string",
+        "defaultValue": ""
+      }
+    },
+    "annotations": [
+      "capstone",
+      "incremental_ingestion",
+      "delta_control"
+    ]
+  }
+}
